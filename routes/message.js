@@ -32,6 +32,7 @@ router.post('/:id', (req, res) => {
       res.json({ output : message, failed : false });
     })
     .catch((error) => {
+      console.log(error);
       res.status(500).json({ output: error, failed: true});
     })
   } else {
