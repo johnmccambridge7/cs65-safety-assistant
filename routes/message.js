@@ -20,14 +20,8 @@ router.post('/:id', (req, res) => {
     toNumber = `+1${toNumber.substring(1)}`;
   }
 
-  var failed = false;
-
-  if (message == null || toNumber == null || fromNumber == null) {
-    failed = true;
-  }
-
   // send message if possible
-  if(!failed) {
+  if (message && toNumber && fromNumber) {
     client.messages
     .create({
       body: message,
