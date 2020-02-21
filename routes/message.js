@@ -9,29 +9,31 @@ const client = require('twilio')(accountSid, authToken);
  * @Twilio
  */
 
-router.get('/', function(req, res, next) {
-  const fromNumber = req.query.from;
-  const toNumber = req.query.to;
-  const message = req.query.message;
+router.post('/:id', (req, res) => {
+  // grab values
+  const fromNumber = '+12035948837';
+  let toNumber = `+${req.params.id.replace(/\D/g,'')}`;
+  const message = req.body.message;
 
-  var failed = false;
-
-  if(message == null || toNumber == null || fromNumber == null) {
-    failed = true;
+  // add in the US country code if missing
+  if (toNumber.length > 1 && toNumber[1] !== "1") {
+    toNumber = `+1${toNumber.substring(1)}`;
   }
 
-
-  if(!failed) {
+  // send message if possible
+  if (message && toNumber && fromNumber) {
     client.messages
     .create({
       body: message,
-      from: '+12035948837',
-      to: '+19206605119'
+      from: fromNumber,
+      to: toNumber
     })
     .then(message => {
-      console.log('sending message');
       res.json({ output : message, failed : false });
-    });
+    })
+    .catch((error) => {
+      res.status(500).json({ output: error, failed: true});
+    })
   } else {
     res.json({ output: null, failed: true });
   }
