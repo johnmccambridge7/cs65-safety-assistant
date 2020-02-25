@@ -1,5 +1,6 @@
-var express = require('express');
-var router = express.Router();
+import express from 'express';
+const router = express();
+
 const accountSid = 'AC9a877687ff66e2131252dcbc440cc0ed';
 const authToken = '1448d4a13c3a8accee0168dcd97f743c';
 const client = require('twilio')(accountSid, authToken);
@@ -32,12 +33,11 @@ router.post('/:id', (req, res) => {
       res.json({ output : message, failed : false });
     })
     .catch((error) => {
-      console.log(error);
-      res.json({ output: error, failed: true});
+      res.status(500).json({ output: error, failed: true});
     })
   } else {
     res.json({ output: null, failed: true });
   }
 });
 
-module.exports = router;
+export default router;
