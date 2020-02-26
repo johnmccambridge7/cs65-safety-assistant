@@ -11,6 +11,8 @@ router.route('/')
 			res.status(400).send({ output: 'Must provide latitude and longitude in body', failed: true });
 		} else if (!(req.body.fallen_user_name)) {
 			res.status(400).send({ output: 'Must provide name of fallen user in body (fallen_user_name)', failed: true });
+		} else if (!(req.body.uid)) {
+			res.status(400).send({ output: 'Must provide uid of request maker', failed: true });
 		} else {
 			const db = firebase.firestore().collection('user-data');
 
@@ -24,7 +26,7 @@ router.route('/')
 					snapshot.forEach((doc) => {
 						const userData = doc.data();
 
-						if (userData.last_known_location) {
+						if (userData.last_known_location && doc.id !== req.body.uid) {
 							const distanceAway = computeDistance(req.body.latitude, req.body.longitude, userData.last_known_location._lat, userData.last_known_location._long, 'M');
 
 							// determine if user is nearby and has opted into receiving messages about others in need
@@ -47,7 +49,7 @@ router.route('/')
 									user_in_need: {
 										name: req.body.fallen_user_name,
 										lat: req.body.latitude,
-										long: req.body.longitude,
+										lng: req.body.longitude,
 										miles_away: distanceAway,
 										timestamp: Date.now(),
 									},
@@ -56,14 +58,17 @@ router.route('/')
 						}
 					});
 
-					res.send({
+					const output = {
 						output: {
 							num_messaged: numMessaged,
-							closest_user: closestUser,
+							closest_user: closestUser || '',
 							closest_distance: closestDistance,
 						},
 						failed: false,
-					});
+					};
+
+					console.log(output);
+					res.send(output);
 				})
 				.catch((error) => {
 					res.status(500).send(error);
