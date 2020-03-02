@@ -2,11 +2,13 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
+import axios from 'axios';
 import * as admin from 'firebase-admin';
 import * as firebase from 'firebase';
 
 import messageRouter from './routes/message';
 import broadcastRouter from './routes/broadcast';
+import devRouter from './routes/dev-router';
 
 require('dotenv').config(); // load environment variables
 
@@ -64,11 +66,12 @@ app.use((req, res, next) => {
 // prefix API endpoints
 app.use('/api/v1/message', messageRouter);
 app.use('/api/v1/broadcast', broadcastRouter);
+app.use('/dev', devRouter);
 
-// // ping the server every 20 minutes so heroku stays awake
-// setInterval(() => {
-// 	axios.get('https://server-6amhealth.herokuapp.com/dev');
-// }, 1200000); // every 5 minutes (300000)
+// ping the server every 20 minutes so heroku stays awake
+setInterval(() => {
+	axios.get('https://cs65backend.herokuapp.com/dev');
+}, 1200000); // every 5 minutes (300000)
 
 // START THE SERVER
 // =============================================================================
